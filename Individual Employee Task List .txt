@@ -1,0 +1,38 @@
+<html>
+<head>
+<title> Individual Employee Task List </title>
+</head>
+<style>
+ table,th,td {
+  border: solid 1px #777;
+  padding: 5px;
+   
+  }
+ th { background-color: lightblue;}
+td {padding: 5px;}
+</style>
+<body>
+<h1 style="text-align: center;"> Corporate Communications - Employee Individual Task List </h1>
+<h3> Employee Name: Ramita </h3>
+<div class="container">
+<table style="width:60%" ,   align="center" style="margin: 0px auto;">
+<caption style="font-size: 20px;"><b> Task List of Ramita </b></caption>
+<tbody>
+<th style="width:35%"> Task List </th>
+<th style="width:10%" style="text-align: center;"> Rating </th>
+<tr>
+<td> Task 1:Prepare a presentationDeck </td>
+<td style="text-align: center;"> 8 </td>
+</tr>
+<tr><td> Task 2 :Article Review</td>
+<td style="text-align: center;"> 5 </td>
+</tr>
+<tr>
+<td> Task 3 :</td>
+<td style="text-align: center;"> 8 </td></tr>
+<tr><td> Task 4 :Article Review</td>
+<td style="text-align: center;"> 10 </td></tr>
+<tr><td> Task 5 :Article Review</td>
+<td style="text-align: center;"> 7 </td></tr>
+</tbody>
+</table>
