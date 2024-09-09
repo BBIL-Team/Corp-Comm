@@ -1,0 +1,445 @@
+<html>
+<head>
+<title> Individual Employee Task List </title>
+</head>
+
+<style>
+textarea{ 
+	 height: 25px;
+         width: 250px;
+	}
+ table,th,td{
+  border: solid 1px #777;
+  padding: 5px;
+   
+  }
+ th { background-color: lightblue;}
+td {padding: 5px;}
+ input:focus{
+        outline: none;
+    }
+                
+.button { width: 120px;
+         margin-right: 50px;
+         display: flex;
+         margin-bottom:10px; /* Add space between buttons */
+         "text-align: center;"
+         }
+.Employee{
+        text-align: center;
+         font-size: 20px;
+         font-weight: bold;
+         }
+.btn { width: 150px;
+         margin-left: 1650px;
+         font-size: 14px;
+         background-color: lightblue;
+         margin-bottom:10px; /* Add space between buttons */
+         "text-align: center;"}
+.modal {
+            display: none;
+            position:fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 70%;
+            height: 100%;
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>
+<body>
+<h1 style="text-align: center;"> Corporate Communications - Employee Individual Task List </h1>
+<link href="https://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css" rel="stylesheet"/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<div class='picker'>
+          <label for="fromperiod">From</label>
+          <input type="text" id="fromperiod" name="from">
+          <label for="toperiod">to</label>
+          <input type="text" id="toperiod" name="to">
+        </div>
+<div>
+	<table style="width:90%" , align="center" style="margin: 0px auto;">
+	<caption style="font-size: 20px;"><b> Employee Task List </b> </caption><button class="btn" onclick="addRow();"> <b> Add Employee</b></button><br><button class="btn"> <b> Remove Employee</b></button></caption>
+	<tbody>
+	<div>
+		<th style="width:15%"> Employee Name</th>
+		<th  style="width:20%"> Task List </th>
+		<th style="width:15%"> Start Date </th>
+		<th style="width:15%"> End Date </th>
+		<th style="text-align: center;" style="width:15%"> Rating </th>
+		<th style="width:15%"> Remarks </th>
+		<th style="width:10%"></th>
+
+		</table>
+	</div>
+<!-------------------------------------------------------------------------------------Ramita Task table starts-------------------------------------------------------------------------------------------------------------->
+		<table id="tasktable1" style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+			
+			<tr>
+			<td rowspan="150" class="Employee" style="width:15%"> Ramita</td>
+			</tr>
+			<tr>
+			<td style="width:20%">  </td>
+			<td style="width:15%"></td>
+			<td style="width:15%"></td>
+			<td style="text-align: center;" style="width:15%" ></td>
+			<td style="width:15%">  </td>
+			<td  rowspan="5" style="width:10%" ><button class="button" onclick="addRow(1);"> <b> Add Task </b></button><button class="button" onclick="showRemoveTaskModal()">Remove Task</button><button class="button"> <b> Edit Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			
+			</tr>
+			<tr id="taskRow1">
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;" style="width:15%" > 8 </td>
+			<td style="width:15%"> <Textarea ></textarea> </td>
+			
+			</tr>
+
+			<tr id="taskRow2"><td> Task 2 :Article Review</td>
+			<td style="width:15%"><input type="date" size="50"</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea ></textarea> </td>
+
+			</tr>
+			<tr id="taskRow3">
+			<td> Task 3 :</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea ></textarea> </td>
+	 		<tr id="taskRow4"><td> Task 4 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea ></textarea> </td>
+			</tr>
+			<tr id="taskRow5"><td> Task 5 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea ></textarea> </td>
+			</tr>
+			
+			
+		</tbody>
+		</table>
+<!------------------------------------------------------------------------------------- Remove task Popup form starts-------------------------------------------------------------------------------->
+		 <!-- Modal -->
+    <div id="removeTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideRemoveTaskModal()">&times;</span>
+            <h3>Select Tasks to Remove</h3>
+            <form id="removeTaskForm"></form>
+            <button type="button" onclick="removeSelectedTasks()">Confirm Removal</button>
+            <button type="button" onclick="hideRemoveTaskModal()">Cancel</button>
+        </div>
+    </div>
+<!------------------------------------------------------------------------------------- Remove task Popup form ends---------------------------------------------------------------------------------->
+		<script>
+       
+      			function addRow(i) {
+			let y="tasktable"+i
+           		let table = document.getElementById(y);
+            		let newRow = table.insertRow();
+            		let cell1 = newRow.insertCell(0);
+  			let cell2 = newRow.insertCell(1);
+			let cell3 = newRow.insertCell(2);
+			let cell4 = newRow.insertCell(3);
+			let cell5 = newRow.insertCell(4);
+            		cell1.innerHTML = '<input type="text" size="50">';
+			cell2.innerHTML = '<input type="date">';
+			cell3.innerHTML = '<input type="date">';
+			cell4.innerHTML = '<input type="number" min="1" max="5">';
+			cell5.innerHTML = '<Textarea ></textarea>';
+			
+			} 
+<!-------------------------------------------------------------------------------------------Script for remove task--------------------------------------------------------------------->
+                          function showRemoveTaskModal() {
+            const taskTable = document.getElementById('tasktable1').getElementsByTagName('tbody')[0];
+            const removeTaskForm = document.getElementById('removeTaskForm');
+            removeTaskForm.innerHTML = ''; // Clear previous entries
+
+            const rows = taskTable.getElementsByTagName('tr');
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const taskName = row.cells[0].textContent.trim();
+                const startDate = row.cells[1].textContent.trim();
+                const endDate = row.cells[2].textContent.trim();
+                const rowId = row.id;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'tasks';
+                checkbox.value = rowId;
+
+                const label = document.createElement('label');
+                label.textContent = `${taskName} (${startDate} - ${endDate})`;
+
+                removeTaskForm.appendChild(checkbox);
+                removeTaskForm.appendChild(label);
+                removeTaskForm.appendChild(document.createElement('br'));
+            }
+
+            document.getElementById('removeTaskModal').style.display = 'block';
+        }
+
+        function hideRemoveTaskModal() {
+            document.getElementById('removeTaskModal').style.display = 'none';
+        }
+
+        function removeSelectedTasks() {
+            const taskTable = document.getElementById('tasktable1').getElementsByTagName('tbody')[0];
+            const checkboxes = document.getElementsByName('tasks');
+
+            for (let i = checkboxes.length - 1; i >= 0; i--) {
+                if (checkboxes[i].checked) {
+                    const rowId = checkboxes[i].value;
+                    const row = document.getElementById(rowId);
+                    taskTable.removeChild(row); // Remove row directly
+                }
+            }
+
+            hideRemoveTaskModal();
+        }
+<!------------------------------------------------------------------------------------script for remove task ends----------------------------------------------------------------------------------------------------->
+	</script>
+<!-------------------------------------------------------------------------------------Ramita Task table ends-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------Surya Task table starts-------------------------------------------------------------------------------------------------------------->
+    		<table id="tasktable2" style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+		<div>
+			<tr>
+			<td rowspan="150" class="Employee" style="width:15%">Surya</td>
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;" style="width:15%"> 8 </td>
+			<td style="width:15%"> <Textarea></textarea> </td>
+			<td  rowspan="5" style="width:10%" ><button class="button" onclick="addRow(2);"> <b> Add Task </b></button><button class="button"> <b> Edit Task </b> </button><button class="button" onclick="deleteRow(2)"> <b> Remove Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			</tr>
+
+			<tr><td> Task 2 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea></textarea> </td>
+
+			</tr>
+			<tr>
+			<td> Task 3 :</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea></textarea> </td>
+	 		<tr><td> Task 4 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr><td> Task 5 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea></textarea> </td>
+		</tbody>
+
+		</table>
+		</div>
+<!-------------------------------------------------------------------------------------surya Task table ends-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------Mukheshwari Task table starts-------------------------------------------------------------------------------------------------------------->
+		<table id="tasktable3" style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+		<div>
+			<tr>
+			<td rowspan="50" class="Employee" style="width:15%"> Mukheshwari </td>
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;" style="width:15%"> 8 </td>
+			<td style="width:15%"> <Textarea></textarea> </td>
+			<td  rowspan="5" style="width:10%"><button class="button"  onclick="addRow(3);"> <b> Add Task </b></button><button class="button"> <b> Edit Task </b> </button><button class="button"  onclick="deleteRow(3)"> <b> Remove Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			</tr>
+
+			<tr><td> Task 2 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea></textarea> </td>
+			
+			</tr>
+			<tr>
+			<td> Task 3 :</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea></textarea> </td>
+			<tr><td> Task 4 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr><td> Task 5 :Article Review</td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea></textarea> </td>
+		</tbody>
+		</table>
+		</div>
+<!-------------------------------------------------------------------------------------Mukheshwari Task table ends-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------Jemima Task table starts-------------------------------------------------------------------------------------------------------------->
+		<table id="tasktable4"style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+		<div>
+			<tr>
+			<td rowspan="50" class="Employee" style="width:15%">Jemima </td>
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td style="width:15%"> <Textarea></textarea> </td>
+			<td  rowspan="5" style="width:10%"><button class="button" onclick="addRow(4);"> <b> Add Task </b></button><button class="button"> <b> Edit Task </b> </button><button class="button" onclick="deleteRow(4)"> <b> Remove Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			</tr>
+			<tr><td> Task 2 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr>
+			<td> Task 3 :</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea></textarea> </td>
+			<tr><td> Task 4 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr><td> Task 5 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea></textarea> </td>
+			<tr>
+		</tbody>
+		</table>
+		</div>
+<!-------------------------------------------------------------------------------------Jemima Task table ends-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------Mrunal Task table starts-------------------------------------------------------------------------------------------------------------->
+		<table id="tasktable5"style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+		<div>
+			<td rowspan="50" class="Employee"style="width:15%">  Mrunal </td>
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td style="width:15%"> <Textarea></textarea> </td>
+			<td  rowspan="5" style="width:10%"><button class="button" onclick="addRow(5);"> <b> Add Task </b></button><button class="button"> <b> Edit Task </b> </button><button class="button" onclick="deleteRow(5)"> <b> Remove Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			</tr>
+
+			<tr><td> Task 2 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr>
+			<td> Task 3 :</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea></textarea> </td>
+			<tr><td> Task 4 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr><td> Task 5 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea></textarea> </td>
+		</tbody>
+		</table>
+		</div>
+<!-------------------------------------------------------------------------------------Mrunal Task table ends-------------------------------------------------------------------------------------------------------------->
+<!-------------------------------------------------------------------------------------Pramod Task table starts-------------------------------------------------------------------------------------------------------------->
+		<table id="tasktable6" style="width:90%" , align="center" style="margin: 0px auto;">
+		<tbody>
+		<div>
+			<tr>
+			<td rowspan="50" class="Employee" style="width:15%"> Pramod </td>
+			<td style="width:20%"> Task 1:Prepare a presentationDeck </td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="width:15%"><input type="date" ></td>
+			<td style="text-align: center;" style="width:15%"> 8 </td>
+			<td style="width:15%"> <Textarea></textarea> </td>
+			<td  rowspan="5" style="width:10%"><button class="button" onclick="addRow(6);"> <b> Add Task </b></button><button class="button"> <b> Edit Task </b> </button><button class="button" onclick="deleteRow(6)"> <b> Remove Task </b> </button><button class="button"> <b>Rate Task</b> </button></td>
+			</tr>
+
+			<tr><td> Task 2 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 5 </td>
+			<td> <Textarea></textarea> </td>
+
+			</tr>
+			<tr>
+			<td> Task 3 :</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 8 </td>
+			<td> <Textarea></textarea> </td>
+			<tr><td> Task 4 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 10 </td>
+			<td> <Textarea></textarea> </td>
+			</tr>
+			<tr><td> Task 5 :Article Review</td>
+			<td ><input type="date" ></td>
+			<td ><input type="date" ></td>
+			<td style="text-align: center;"> 7 </td>
+			<td> <Textarea></textarea> </td>
+		</tbody>
+		</table>
+		</div>
+<!-------------------------------------------------------------------------------------Pramod Task table endss-------------------------------------------------------------------------------------------------------------->
+		</div>
+		</div>
+</table>
+</body>
+</html>
