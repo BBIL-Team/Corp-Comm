@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Task List</title>
+    <style>
+        /* Styles for the page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e2e2e2;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #008080;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        .logo {
+            height: 120px;
+            margin-right: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 90%;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://www.bharatbiotech.com/images/bharat-biotech-logo.jpg" alt="Company Logo" class="logo">
+    </header>
+    <h1 style="text-align: center;">Corporate Communications - Employee Task List</h1>
+    <div class="container">
+        <form id="employeeForm">
+            <label for="employeeID">Enter Employee ID:</label>
+            <input type="text" id="employeeID" name="employeeID" required>
+            <button type="submit">Fetch Tasks</button>
+        </form>
+        <div id="cardContainer">
+            <!-- Task cards from Lambda will be inserted here -->
+        </div>
+        <!-- Single Edit button -->
+        <button id="editButton" style="display:none;" onclick="showEditPopup()">Edit Tasks</button>
+    </div>
+
+    <!-- Popup for editing tasks -->
+    <div id="editPopup" class="popup">
+        <h3>Edit Tasks</h3>
+        <div id="popupContent">
+            <!-- Content for popup will be inserted here -->
+        </div>
+        <button onclick="saveChanges()">Save</button>
+        <button onclick="closePopup()">Close</button>
+    </div>
+    
+    <!-- Overlay for popup -->
+    <div id="overlay" class="overlay" onclick="closePopup()"></div>
+
+    <script>
+        document.getElementById('employeeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var employeeID = document.getElementById('employeeID').value.trim();
+
+            if (!employeeID) {
+                alert('Please enter an Employee ID.');
+                return;
+            }
+
+            fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('cardContainer').innerHTML = data;
+                    
+                    // Show the "Edit" button if there are tasks
+                    if (data.trim() !== '') {
+                        document.getElementById('editButton').style.display = 'block';
+                    } else {
+                        document.getElementById('editButton').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('cardContainer').innerHTML = '<p>Error fetching data. Please try again later.</p>';
+                    document.getElementById('editButton').style.display = 'none';
+                });
+        });
+
+       function showEditPopup() {
+    // Get the rows in the cardContainer and prepare to create the popup content
+    var cardContainer = document.getElementById('cardContainer');
+    var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
+
+    var popupContent = `
+        <table border="1" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Task Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Rate</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Loop through each row to create the popup table
+    rows.forEach(row => {
+        var cells = row.querySelectorAll('td');
+
+        if (cells.length >= 3) { // Adjust based on your table's structure
+            var taskDescription = cells[0].innerText; // Assuming 'Task Description' is the 1st cell
+            var startDate = cells[1].innerText; // Assuming 'Start Date' is the 2nd cell
+            var endDate = cells[2].innerText; // Assuming 'End Date' is the 3rd cell
+            var rate = cells[3] ? cells[3].innerText : ''; // Assuming 'Rate' is the 4th cell
+            var remarks = cells[4] ? cells[4].innerText : ''; // Assuming 'Remarks' is the 5th cell
+
+            // Generate the popup table row
+            popupContent += `
+                <tr>
+                    <td>${taskDescription}</td>
+                    <td>${startDate}</td>
+                    <td>${endDate}</td>
+                    <td><input type="number" min="1" max="5" /></td>
+                    <td><input type="text"/></td>
+                </tr>
+            `;
+        }
+    });
+
+    popupContent += `
+            </tbody>
+        </table>
+    `;
+
+    // Insert the generated table into the popup
+    document.getElementById('popupContent').innerHTML = popupContent;
+
+    // Show the popup and overlay
+    document.getElementById('editPopup').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+
+        function saveChanges() {
+            // Logic to capture the updated values
+            var popupContent = document.getElementById('popupContent');
+            var inputs = popupContent.querySelectorAll('input');
+
+            // Update the data in cardContainer with the new values
+            var updatedContent = popupContent.innerHTML;
+            document.getElementById('cardContainer').innerHTML = updatedContent;
+
+            // Close the popup
+            closePopup();
+        }
+
+        function closePopup() {
+            document.getElementById('editPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
