@@ -150,7 +150,7 @@
                 });
         });
 
-       function showEditPopup() {
+     function showEditPopup() {
     // Get the rows in the cardContainer and prepare to create the popup content
     var cardContainer = document.getElementById('cardContainer');
     var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
@@ -172,26 +172,28 @@
     `;
 
     // Loop through each row to create the popup table
-    rows.forEach(row => {
+    rows.forEach((row, index) => {
         var cells = row.querySelectorAll('td');
 
-        if (cells.length >= 3) { // Adjust based on your table's structure
-            var taskDescription = cells[0].innerText; // Assuming 'Task Description' is the 1st cell
-            var startDate = cells[1].innerText; // Assuming 'Start Date' is the 2nd cell
-            var endDate = cells[2].innerText; // Assuming 'End Date' is the 3rd cell
-            var rate = cells[3] ? cells[3].innerText : ''; // Assuming 'Rate' is the 4th cell
-            var remarks = cells[4] ? cells[4].innerText : ''; // Assuming 'Remarks' is the 5th cell
+        if (cells.length >= 5) { // Adjust based on your table's structure
+            var employeeId = cells[0].innerText; // Assuming 'Employee ID' is the 1st cell
+            var employeeName = cells[1].innerText; // Assuming 'Employee Name' is the 2nd cell
+            var taskDescription = cells[2].innerText; // Assuming 'Task Description' is the 3rd cell
+            var startDate = cells[3].innerText; // Assuming 'Start Date' is the 4th cell
+            var endDate = cells[4].innerText; // Assuming 'End Date' is the 5th cell
+            var rate = cells[5] ? cells[5].innerText : ''; // Assuming 'Rating' is the 6th cell
+            var remarks = cells[6] ? cells[6].innerText : ''; // Assuming 'Remarks' is the 7th cell
 
-            // Generate the popup table row
+            // Generate the popup table row with inputs for Rating and Remarks
             popupContent += `
                 <tr>
-                    <td>${EmployeeId}</td>
-                    <td>${EmployeeName}</td>
+                    <td>${employeeId}</td>
+                    <td>${employeeName}</td>
                     <td>${taskDescription}</td>
                     <td>${startDate}</td>
                     <td>${endDate}</td>
-                    <td><input type="number" min="1" max="5" /></td>
-                    <td><input type="text"/></td>
+                    <td><input type="number" min="1" max="5" value="${rate}" /></td>
+                    <td><input type="text" value="${remarks}" /></td>
                 </tr>
             `;
         }
@@ -209,6 +211,7 @@
     document.getElementById('editPopup').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
 }
+
 
 
         function saveChanges() {
