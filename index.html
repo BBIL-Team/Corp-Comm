@@ -213,19 +213,28 @@
 }
 
 
+function saveChanges() {
+    var popupContent = document.getElementById('popupContent');
+    var rows = popupContent.querySelectorAll('tbody tr');
+    var cardContainer = document.getElementById('cardContainer');
+    var cardRows = cardContainer.querySelectorAll('tr');
 
-        function saveChanges() {
-            // Logic to capture the updated values
-            var popupContent = document.getElementById('popupContent');
-            var inputs = popupContent.querySelectorAll('input');
+    // Loop through each row in the popup to capture the updated values
+    rows.forEach((row, index) => {
+        var inputs = row.querySelectorAll('input');
+        var updatedRate = inputs[0].value;
+        var updatedRemarks = inputs[1].value;
 
-            // Update the data in cardContainer with the new values
-            var updatedContent = popupContent.innerHTML;
-            document.getElementById('cardContainer').innerHTML = updatedContent;
+        // Update the original cardContainer with new values for Rating and Remarks
+        var cardCells = cardRows[index].querySelectorAll('td');
+        cardCells[5].innerText = updatedRate; // Assuming 'Rating' is the 6th cell
+        cardCells[6].innerText = updatedRemarks; // Assuming 'Remarks' is the 7th cell
+    });
 
-            // Close the popup
-            closePopup();
-        }
+    // Close the popup
+    closePopup();
+}
+
 
         function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
