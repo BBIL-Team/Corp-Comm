@@ -125,31 +125,28 @@
             const rate = document.getElementById('rate').value;
             const remarks = document.getElementById('remarks').value;
 
-            const updatedTask = {
-                employeeId: selectedTask.employeeId,
-                taskDescription: selectedTask.taskDescription,
-                rate: rate,
-                remarks: remarks
-            };
+           const updatedTask = {
+    employeeId: selectedTask.employeeId,
+    taskDescription: selectedTask.taskDescription,
+    rate: rate,
+    remarks: remarks
+};
 
-            // Log the updated data (you can replace this with your API call to Lambda)
-            console.log('Updated Task:', updatedTask);
+// Send updated task details to Lambda
+fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updatedTask)  // Ensure it's correctly stringified
+})
+.then(response => response.json())
+.then(data => {
+    console.log('Task updated successfully:', data);
+    closePopup();
+})
+.catch(error => console.error('Error updating task:', error));
 
-            // Fetch example: Replace this with your Lambda endpoint
-            fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedTask)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Task updated successfully!');
-                closePopup();
-            })
-            .catch(error => console.error('Error updating task:', error));
-        }
 
         // Close the popup
         function closePopup() {
