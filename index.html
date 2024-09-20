@@ -5,35 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Task List</title>
     <style>
-        /* Styles for the page */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e2e2e2;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #008080;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            color: white;
-        }
-        .logo {
-            height: 120px;
-            margin-right: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin: 20px 0;
         }
         table, th, td {
             border: 1px solid #ccc;
@@ -41,28 +16,6 @@
         th, td {
             padding: 10px;
             text-align: left;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="number"] {
-            padding: 10px;
-            flex: 1;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
         }
         .popup {
             display: none;
@@ -90,29 +43,64 @@
     </style>
 </head>
 <body>
-    <header>
-        <img src="https://www.bharatbiotech.com/images/bharat-biotech-logo.jpg" alt="Company Logo" class="logo">
-    </header>
-    <h1 style="text-align: center;">Corporate Communications - Employee Task List</h1>
-    <div class="container">
-        <form id="employeeForm">
-            <label for="employeeID">Enter Employee ID:</label>
-            <input type="text" id="employeeID" name="employeeID" required>
-            <button type="submit">Fetch Tasks</button>
-        </form>
-        <div id="cardContainer">
-            <!-- Task cards from Lambda will be inserted here -->
-        </div>
-        <!-- Single Edit button -->
-        <button id="editButton" style="display:none;" onclick="showEditPopup()">Edit Tasks</button>
+    <div id="cardContainer">
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Task Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Rate</th>
+                    <th>Remarks</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>101</td>
+                    <td>John Doe</td>
+                    <td>Design Webpage</td>
+                    <td>2024-09-01</td>
+                    <td>2024-09-10</td>
+                    <td></td>
+                    <td></td>
+                    <td><button onclick="showEditPopup({employeeId: '101', taskDescription: 'Design Webpage'})">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>102</td>
+                    <td>Jane Smith</td>
+                    <td>Prepare Presentation</td>
+                    <td>2024-09-05</td>
+                    <td>2024-09-15</td>
+                    <td></td>
+                    <td></td>
+                    <td><button onclick="showEditPopup({employeeId: '102', taskDescription: 'Prepare Presentation'})">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>103</td>
+                    <td>Emily Johnson</td>
+                    <td>Develop Mobile App</td>
+                    <td>2024-09-08</td>
+                    <td>2024-09-18</td>
+                    <td></td>
+                    <td></td>
+                    <td><button onclick="showEditPopup({employeeId: '103', taskDescription: 'Develop Mobile App'})">Edit</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- Popup for editing tasks -->
     <div id="editPopup" class="popup">
-        <h3>Edit Tasks</h3>
-        <div id="popupContent">
-            <!-- Content for popup will be inserted here -->
-        </div>
+        <h3>Edit Task</h3>
+        <label for="rate">Rate (1-5):</label>
+        <input type="number" id="rate" min="1" max="5" required>
+        <br><br>
+        <label for="remarks">Remarks:</label>
+        <input type="text" id="remarks" required>
+        <br><br>
         <button onclick="saveChanges()">Save</button>
         <button onclick="closePopup()">Close</button>
     </div>
@@ -121,143 +109,49 @@
     <div id="overlay" class="overlay" onclick="closePopup()"></div>
 
     <script>
-        document.getElementById('employeeForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        let selectedTask = {}; // Will hold the task to be edited
 
-            var employeeID = document.getElementById('employeeID').value.trim();
-
-            if (!employeeID) {
-                alert('Please enter an Employee ID.');
-                return;
-            }
-
-            fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('cardContainer').innerHTML = data;
-                    
-                    // Show the "Edit" button if there are tasks
-                    if (data.trim() !== '') {
-                        document.getElementById('editButton').style.display = 'block';
-                    } else {
-                        document.getElementById('editButton').style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById('cardContainer').innerHTML = '<p>Error fetching data. Please try again later.</p>';
-                    document.getElementById('editButton').style.display = 'none';
-                });
-        });
-
-     function showEditPopup() {
-    // Get the rows in the cardContainer and prepare to create the popup content
-    var cardContainer = document.getElementById('cardContainer');
-    var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
-
-    var popupContent = `
-        <table border="1" style="width: 100%;">
-            <thead>
-                <tr>
-                    <th>Employee Id</th>
-                    <th>Employee Name</th>
-                    <th>Task Description</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Rating</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    // Loop through each row to create the popup table
-    rows.forEach((row, index) => {
-        var cells = row.querySelectorAll('td');
-
-        if (cells.length >= 5) { // Adjust based on your table's structure
-            var employeeId = cells[0].innerText; // Assuming 'Employee ID' is the 1st cell
-            var employeeName = cells[1].innerText; // Assuming 'Employee Name' is the 2nd cell
-            var taskDescription = cells[2].innerText; // Assuming 'Task Description' is the 3rd cell
-            var startDate = cells[3].innerText; // Assuming 'Start Date' is the 4th cell
-            var endDate = cells[4].innerText; // Assuming 'End Date' is the 5th cell
-            var rate = cells[5] ? cells[5].innerText : ''; // Assuming 'Rating' is the 6th cell
-            var remarks = cells[6] ? cells[6].innerText : ''; // Assuming 'Remarks' is the 7th cell
-
-            // Generate the popup table row with inputs for Rating and Remarks
-            popupContent += `
-                <tr>
-                    <td>${employeeId}</td>
-                    <td>${employeeName}</td>
-                    <td>${taskDescription}</td>
-                    <td>${startDate}</td>
-                    <td>${endDate}</td>
-                    <td><input type="number" min="1" max="5" value="${rate}" /></td>
-                    <td><input type="text" value="${remarks}" /></td>
-                </tr>
-            `;
+        // Show the popup with the selected task
+        function showEditPopup(task) {
+            selectedTask = task; // Store task to use later when saving changes
+            document.getElementById('rate').value = '';
+            document.getElementById('remarks').value = '';
+            document.getElementById('editPopup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
-    });
 
-    popupContent += `
-            </tbody>
-        </table>
-    `;
+        // Save the changes and send them to the backend
+        function saveChanges() {
+            const rate = document.getElementById('rate').value;
+            const remarks = document.getElementById('remarks').value;
 
-    // Insert the generated table into the popup
-    document.getElementById('popupContent').innerHTML = popupContent;
+            const updatedTask = {
+                employeeId: selectedTask.employeeId,
+                taskDescription: selectedTask.taskDescription,
+                rate: rate,
+                remarks: remarks
+            };
 
-    // Show the popup and overlay
-    document.getElementById('editPopup').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
+            // Log the updated data (you can replace this with your API call to Lambda)
+            console.log('Updated Task:', updatedTask);
 
-
-function saveChanges() {
-    var popupContent = document.getElementById('popupContent');
-    var rows = popupContent.querySelectorAll('tbody tr');
-
-    // Create an array to hold the updates
-    const updates = [];
-
-    // Loop through each row in the popup to capture the updated values
-    rows.forEach((row, index) => {
-        var inputs = row.querySelectorAll('input');
-        var updatedRate = inputs[0].value;
-        var updatedRemarks = inputs[1].value;
-
-        // Push the updates to the array
-        updates.push({
-            employeeId: row.cells[0].innerText,  // Assuming the first cell is Employee ID
-            rating: updatedRate,
-            remarks: updatedRemarks,
-        });
-    });
-
-    // Send the updates to the Lambda function
-    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updates),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            // Fetch example: Replace this with your Lambda endpoint
+            fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTask)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Task updated successfully!');
+                closePopup();
+            })
+            .catch(error => console.error('Error updating task:', error));
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        closePopup(); // Close the popup after saving
-    })
-    .catch((error) => {
-        console.error('Error saving changes:', error);
-    });
-}
 
-
+        // Close the popup
         function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
