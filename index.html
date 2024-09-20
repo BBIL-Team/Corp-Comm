@@ -114,7 +114,7 @@
         // Show the popup with the selected task
         function showEditPopup(task) {
             selectedTask = task; // Store task to use later when saving changes
-            document.getElementById('rate').value = '';
+            document.getElementById('rate').value = ''; // Clear previous values
             document.getElementById('remarks').value = '';
             document.getElementById('editPopup').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
@@ -125,34 +125,39 @@
             const rate = document.getElementById('rate').value;
             const remarks = document.getElementById('remarks').value;
 
-           const updatedTask = {
-    employeeId: selectedTask.employeeId,
-    taskDescription: selectedTask.taskDescription,
-    rate: rate,
-    remarks: remarks
-};
+            const updatedTask = {
+                employeeId: selectedTask.employeeId,
+                taskDescription: selectedTask.taskDescription,
+                rate: rate,
+                remarks: remarks
+            };
 
-// Send updated task details to Lambda
-fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedTask)  // Ensure it's correctly stringified
-})
-.then(response => response.json())
-.then(data => {
-    console.log('Task updated successfully:', data);
-    closePopup();
-})
-.catch(error => console.error('Error updating task:', error));
-
+            // Send updated task details to Lambda
+            fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTask)  // Ensure it's correctly stringified
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Task updated successfully:', data);
+                closePopup();
+            })
+            .catch(error => console.error('Error updating task:', error));
+        }
 
         // Close the popup
         function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
-    }
-</script>
+        }
+    </script>
 </body>
 </html>
