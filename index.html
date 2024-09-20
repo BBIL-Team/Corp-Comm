@@ -216,8 +216,9 @@
 function saveChanges() {
     var popupContent = document.getElementById('popupContent');
     var rows = popupContent.querySelectorAll('tbody tr');
-    var cardContainer = document.getElementById('cardContainer');
-    var cardRows = cardContainer.querySelectorAll('tr');
+
+    // Create an array to hold the updates
+    const updates = [];
 
     // Loop through each row in the popup to capture the updated values
     rows.forEach((row, index) => {
@@ -225,14 +226,35 @@ function saveChanges() {
         var updatedRate = inputs[0].value;
         var updatedRemarks = inputs[1].value;
 
-        // Update the original cardContainer with new values for Rating and Remarks
-        var cardCells = cardRows[index].querySelectorAll('td');
-        cardCells[5].innerText = updatedRate; // Assuming 'Rating' is the 6th cell
-        cardCells[6].innerText = updatedRemarks; // Assuming 'Remarks' is the 7th cell
+        // Push the updates to the array
+        updates.push({
+            employeeId: row.cells[0].innerText,  // Assuming the first cell is Employee ID
+            rating: updatedRate,
+            remarks: updatedRemarks,
+        });
     });
 
-    // Close the popup
-    closePopup();
+    // Send the updates to the Lambda function
+    fetch('https://your-lambda-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        closePopup(); // Close the popup after saving
+    })
+    .catch((error) => {
+        console.error('Error saving changes:', error);
+    });
 }
 
 
