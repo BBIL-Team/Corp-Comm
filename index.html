@@ -203,9 +203,9 @@
       function saveChanges() {
     // Assuming you have logic to get the correct employeeId, taskDescription, rate, and remarks from your form or popup
     var employeeId = document.getElementById('employeeID').value.trim();
-    var taskDescription =;  // Capture task description from the form or popup
-    var rate = ...;  // Capture rate from the input field
-    var remarks = ...;  // Capture remarks from the input field
+    var taskDescription = document.querySelector('.popupContent .taskDescription').innerText;
+    var rate = document.querySelector('.popupContent .rateInput').value.trim();
+    var remarks = document.querySelector('.popupContent .remarkInput').value.trim();
 
     if (!employeeId || !taskDescription || !rate || !remarks) {
         alert("Please fill in all fields before saving.");
