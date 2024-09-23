@@ -235,21 +235,18 @@ function saveChanges() {
     .then(data => {
         console.log('Success:', data);
         closePopup(); // Close the popup on success
-        // Optionally refresh tasks here
+        // Optionally refresh tasks here if needed
     })
     .catch(error => {
         console.error('Error:', error);
     });
 }
 
-            // Close the popup
-            closePopup();
-        }
+function closePopup() {
+    document.getElementById('editPopup').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
 
-        function closePopup() {
-            document.getElementById('editPopup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
     </script>
 </body>
 </html>
