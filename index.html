@@ -150,50 +150,55 @@
                 });
         });
 
-        function showEditPopup() {
-            var cardContainer = document.getElementById('cardContainer');
-            var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
+      function showEditPopup() {
+    var cardContainer = document.getElementById('cardContainer');
+    var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
 
-            var popupContent = `<table border="1" style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th>Employee ID</th>
-                                            <th>Employee Name</th>
-                                            <th>Task Description</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Rate</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
-            
-            rows.forEach(row => {
-                var cells = row.querySelectorAll('td');
-                if (cells.length >= 3) {
-                    var taskDescription = cells[0].innerText;
-                    var startDate = cells[1].innerText;
-                    var endDate = cells[2].innerText;
-                    var rate = cells[3] ? cells[3].innerText : '';
-                    var remarks = cells[4] ? cells[4].innerText : '';
+    var popupContent = `<table border="1" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Employee Name</th>
+                                    <th>Task Description</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Rate</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
-                    popupContent += `<tr>
-                                        <td>${taskDescription}</td>
-                                        <td>${startDate}</td>
-                                        <td>${endDate}</td>
-                                        <td><input type="number" class="rateInput" value="${rate}" min="1" max="5" /></td>
-                                        <td><input type="text" class="remarkInput" value="${remarks}" /></td>
-                                     </tr>`;
-                }
-            });
+    rows.forEach(row => {
+        var cells = row.querySelectorAll('td');
+        if (cells.length >= 6) { // Make sure there are enough columns
+            var employeeID = cells[0].innerText; // Assuming employee ID is in first column
+            var employeeName = cells[1].innerText; // Assuming employee name is in second column
+            var taskDescription = cells[2].innerText; // Task description is in the third column
+            var startDate = cells[3].innerText; // Start date in the fourth column
+            var endDate = cells[4].innerText; // End date in the fifth column
+            var rate = cells[5] ? cells[5].innerText : ''; // Rate in the sixth column (input field here)
+            var remarks = cells[6] ? cells[6].innerText : ''; // Remarks in the seventh column (input field here)
 
-            popupContent += `</tbody></table>`;
-
-            document.getElementById('popupContent').innerHTML = popupContent;
-
-            document.getElementById('editPopup').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+            popupContent += `<tr>
+                                <td>${employeeID}</td>
+                                <td>${employeeName}</td>
+                                <td>${taskDescription}</td>
+                                <td>${startDate}</td>
+                                <td>${endDate}</td>
+                                <td><input type="number" class="rateInput" value="${rate}" min="1" max="5" /></td>
+                                <td><input type="text" class="remarkInput" value="${remarks}" /></td>
+                             </tr>`;
         }
+    });
+
+    popupContent += `</tbody></table>`;
+
+    document.getElementById('popupContent').innerHTML = popupContent;
+
+    document.getElementById('editPopup').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
 
         function saveChanges() {
             var employeeID = document.getElementById('employeeID').value.trim();
