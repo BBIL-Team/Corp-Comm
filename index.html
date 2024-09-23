@@ -200,58 +200,44 @@
 }
 
 
-      function saveChanges() {
+     function saveChanges() {
     var employeeId = document.getElementById('employeeID').value.trim();
-    
-    var rows = document.querySelectorAll('#popupContent tr');
-    
-    // Loop through rows to get updated values for rate and remarks
-    rows.forEach(row => {
-        var rateInput = row.querySelector('.rateInput');
-        var remarkInput = row.querySelector('.remarkInput');
-        var taskDescription = row.cells[2].innerText; // Assuming task description is in the third column
+    var taskDescription = document.querySelector('.popupContent .taskDescription').value.trim();
+    var rate = document.querySelector('.popupContent .rateInput').value.trim();
+    var remarks = document.querySelector('.popupContent .remarkInput').value.trim();
 
-        if (!employeeId || !taskDescription || !rateInput || !remarkInput) {
-            alert("Please fill in all fields before saving.");
-            return;
+    if (!employeeId || !taskDescription || !rate || !remarks) {
+        alert("Please fill in all fields before saving.");
+        return;
+    }
+
+    // Send as a plain text string in the format: "employeeId,taskDescription,rate,remarks"
+    var textData = `${employeeId},${taskDescription},${rate},${remarks}`;
+
+    // Sending the plain text data to Lambda
+    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        body: textData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
         }
-
-        var rate = rateInput.value.trim();
-        var remarks = remarkInput.value.trim();
-
-        var data = {
-            employeeId: employeeId,
-            taskDescription: taskDescription,
-            rate: rate,
-            remarks: remarks
-        };
-
-        // Send data to Lambda
-        fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            alert('Task updated successfully!');
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Failed to update the task: ' + error.message);
-        });
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Task updated successfully!');
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('Failed to update the task: ' + error.message);
     });
 }
-
- function closePopup() {
+function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
