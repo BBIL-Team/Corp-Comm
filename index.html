@@ -150,9 +150,10 @@
                 });
         });
 
-      function showEditPopup() {
+       function showEditPopup() {
+    // Get the rows in the cardContainer and prepare to create the popup content
     var cardContainer = document.getElementById('cardContainer');
-    var rows = cardContainer.querySelectorAll('tr'); 
+    var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
 
     var popupContent = `
         <table border="1" style="width: 100%;">
@@ -168,22 +169,25 @@
             <tbody>
     `;
 
-    rows.forEach((row, index) => {
+    // Loop through each row to create the popup table
+    rows.forEach(row => {
         var cells = row.querySelectorAll('td');
-        if (cells.length >= 3) {
-            var taskDescription = cells[0].innerText;
-            var startDate = cells[1].innerText;
-            var endDate = cells[2].innerText;
-            var rate = cells[3] ? cells[3].innerText : '';
-            var remarks = cells[4] ? cells[4].innerText : '';
 
+        if (cells.length >= 3) { // Adjust based on your table's structure
+            var taskDescription = cells[0].innerText; // Assuming 'Task Description' is the 1st cell
+            var startDate = cells[1].innerText; // Assuming 'Start Date' is the 2nd cell
+            var endDate = cells[2].innerText; // Assuming 'End Date' is the 3rd cell
+            var rate = cells[3] ? cells[3].innerText : ''; // Assuming 'Rate' is the 4th cell
+            var remarks = cells[4] ? cells[4].innerText : ''; // Assuming 'Remarks' is the 5th cell
+
+            // Generate the popup table row
             popupContent += `
                 <tr>
                     <td>${taskDescription}</td>
                     <td>${startDate}</td>
                     <td>${endDate}</td>
-                    <td><input type="number" min="1" max="5" data-task-id="${index}" value="${rate}" /></td>
-                    <td><input type="text" data-task-id="${index}" value="${remarks}" /></td>
+                    <td><input type="number" min="1" max="5" /></td>
+                    <td><input type="text"/></td>
                 </tr>
             `;
         }
@@ -194,59 +198,32 @@
         </table>
     `;
 
+    // Insert the generated table into the popup
     document.getElementById('popupContent').innerHTML = popupContent;
+
+    // Show the popup and overlay
     document.getElementById('editPopup').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
 }
 
-function saveChanges() {
-    var popupContent = document.getElementById('popupContent');
-    var rateInputs = popupContent.querySelectorAll('input[type="number"]');
-    var remarkInputs = popupContent.querySelectorAll('input[type="text"]');
 
-    var tasksData = [];
+        function saveChanges() {
+            // Logic to capture the updated values
+            var popupContent = document.getElementById('popupContent');
+            var inputs = popupContent.querySelectorAll('input');
 
-    rateInputs.forEach(input => {
-        var taskId = input.getAttribute('data-task-id');
-        var rate = input.value;
-        var remark = remarkInputs[taskId].value; // Corresponding remark input
+            // Update the data in cardContainer with the new values
+            var updatedContent = popupContent.innerHTML;
+            document.getElementById('cardContainer').innerHTML = updatedContent;
 
-        tasksData.push({
-            taskId: taskId,
-            rate: rate,
-            remark: remark
-        });
-    });
-
-    // Send data to Lambda function
-    fetch('https://your-lambda-url.amazonaws.com/prod/saveTasks', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(tasksData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            // Close the popup
+            closePopup();
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        closePopup(); // Close the popup on success
-        // Optionally refresh tasks here if needed
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
 
-function closePopup() {
-    document.getElementById('editPopup').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
+        function closePopup() {
+            document.getElementById('editPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
     </script>
 </body>
 </html>
