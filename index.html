@@ -131,7 +131,7 @@
                 return;
             }
 
-            fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
+            fetch(`https://YOUR_LAMBDA_API_URL?EmployeeID=${encodeURIComponent(employeeID)}`)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('cardContainer').innerHTML = data;
@@ -150,105 +150,92 @@
                 });
         });
 
-     function showEditPopup() {
-    var cardContainer = document.getElementById('cardContainer');
-    var rows = cardContainer.querySelectorAll('tr'); 
+        function showEditPopup() {
+            var cardContainer = document.getElementById('cardContainer');
+            var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
 
-    var popupContent = `
-        <table border="1" style="width: 100%;">
-            <thead>
-                <tr>
-                    <th>Employee ID</th>
-                    <th>Employee Name</th>
-                    <th>Task Description</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Rate</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+            var popupContent = `<table border="1" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Task Description</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Rate</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            rows.forEach(row => {
+                var cells = row.querySelectorAll('td');
+                if (cells.length >= 3) {
+                    var taskDescription = cells[0].innerText;
+                    var startDate = cells[1].innerText;
+                    var endDate = cells[2].innerText;
+                    var rate = cells[3] ? cells[3].innerText : '';
+                    var remarks = cells[4] ? cells[4].innerText : '';
 
-    rows.forEach((row, index) => {
-        var cells = row.querySelectorAll('td');
-        if (cells.length >= 3) {
-            var taskDescription = cells[0].innerText;
-            var startDate = cells[1].innerText;
-            var endDate = cells[2].innerText;
-            var rate = cells[3] ? cells[3].innerText : '';
-            var remarks = cells[4] ? cells[4].innerText : '';
+                    popupContent += `<tr>
+                                        <td>${taskDescription}</td>
+                                        <td>${startDate}</td>
+                                        <td>${endDate}</td>
+                                        <td><input type="number" class="rateInput" value="${rate}" min="1" max="5" /></td>
+                                        <td><input type="text" class="remarkInput" value="${remarks}" /></td>
+                                     </tr>`;
+                }
+            });
 
-            popupContent += `
-                <tr>
-                    <td>${taskDescription}</td>
-                    <td>${startDate}</td>
-                    <td>${endDate}</td>
-                    <td><input type="number" min="1" max="5" data-task-id="${index}" value="${rate}" /></td>
-                    <td><input type="text" value="${remarks}" /></td>
-                </tr>
-            `;
+            popupContent += `</tbody></table>`;
+
+            document.getElementById('popupContent').innerHTML = popupContent;
+
+            document.getElementById('editPopup').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
         }
-    });
 
-    popupContent += `
-            </tbody>
-        </table>
-    `;
+        function saveChanges() {
+            var employeeID = document.getElementById('employeeID').value.trim();
+            var popupContent = document.getElementById('popupContent');
+            var taskRows = popupContent.querySelectorAll('tbody tr');
 
-    document.getElementById('popupContent').innerHTML = popupContent;
-    document.getElementById('editPopup').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
+            var tasksToUpdate = [];
 
-function saveChanges() {
-    var popupContent = document.getElementById('popupContent');
-    var rateInputs = popupContent.querySelectorAll('input[type="number"]');
-    var remarkInputs = popupContent.querySelectorAll('input[type="text"]');
+            taskRows.forEach(row => {
+                var taskDescription = row.cells[0].innerText;
+                var rate = row.querySelector('.rateInput').value;
+                var remarks = row.querySelector('.remarkInput').value;
 
-    var tasksData = [];
+                tasksToUpdate.push({
+                    taskDescription: taskDescription,
+                    rate: rate,
+                    remarks: remarks
+                });
+            });
 
-    rateInputs.forEach(input => {
-        var taskId = input.getAttribute('data-task-id');
-        var rate = input.value;
-        var remark = remarkInputs[taskId].value; // Corresponding remark input
-
-        tasksData.push({
-            taskId: taskId,
-            rate: rate,
-            remark: remark
-        });
-    });
-
-    // Send data to Lambda function
-    fetch('https://your-lambda-url.amazonaws.com/prod/saveTasks', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(tasksData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            fetch('YOUR_LAMBDA_API_URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    employeeId: employeeID,
+                    tasks: tasksToUpdate
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Tasks updated successfully!');
+                closePopup();
+            })
+            .catch(error => {
+                console.error('Error updating tasks:', error);
+            });
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        closePopup(); // Close the popup on success
-        // Optionally refresh tasks here if needed
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
 
-function closePopup() {
-    document.getElementById('editPopup').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
+        function closePopup() {
+            document.getElementById('editPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
     </script>
 </body>
 </html>
