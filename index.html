@@ -203,7 +203,7 @@
       function saveChanges() {
     // Assuming you have logic to get the correct employeeId, taskDescription, rate, and remarks from your form or popup
     var employeeId = document.getElementById('employeeID').value.trim();
-    var taskDescription = document.querySelector('.popupContent .taskDescription').innerText;
+    var taskDescription = document.querySelector('.popupContent .taskDescription').value.trim();
     var rate = document.querySelector('.popupContent .rateInput').value.trim();
     var remarks = document.querySelector('.popupContent .remarkInput').value.trim();
 
