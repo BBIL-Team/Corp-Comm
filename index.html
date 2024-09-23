@@ -200,44 +200,48 @@
 }
 
 
-        function saveChanges() {
-            var employeeID = document.getElementById('employeeID').value.trim();
-            var popupContent = document.getElementById('popupContent');
-            var taskRows = popupContent.querySelectorAll('tbody tr');
+      function saveChanges() {
+    // Assuming you have logic to get the correct employeeId, taskDescription, rate, and remarks from your form or popup
+    var employeeId = document.getElementById('employeeID').value.trim();
+    var taskDescription = ...;  // Capture task description from the form or popup
+    var rate = ...;  // Capture rate from the input field
+    var remarks = ...;  // Capture remarks from the input field
 
-            var tasksToUpdate = [];
+    if (!employeeId || !taskDescription || !rate || !remarks) {
+        alert("Please fill in all fields before saving.");
+        return;
+    }
 
-            taskRows.forEach(row => {
-                var taskDescription = row.cells[0].innerText;
-                var rate = row.querySelector('.rateInput').value;
-                var remarks = row.querySelector('.remarkInput').value;
+    var data = {
+        employeeId: employeeId,
+        taskDescription: taskDescription,
+        rate: rate,
+        remarks: remarks
+    };
 
-                tasksToUpdate.push({
-                    taskDescription: taskDescription,
-                    rate: rate,
-                    remarks: remarks
-                });
-            });
-
-            fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    employeeId: employeeID,
-                    tasks: tasksToUpdate
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Tasks updated successfully!');
-                closePopup();
-            })
-            .catch(error => {
-                console.error('Error updating tasks:', error);
-            });
+    // Sending the data to Lambda
+    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        alert('Task updated successfully!');
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('Failed to update the task: ' + error.message);
+    });
+}
 
         function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
