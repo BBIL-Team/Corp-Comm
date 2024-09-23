@@ -201,49 +201,57 @@
 
 
       function saveChanges() {
-    // Assuming you have logic to get the correct employeeId, taskDescription, rate, and remarks from your form or popup
     var employeeId = document.getElementById('employeeID').value.trim();
-    var taskDescription = document.querySelector('.popupContent .taskDescription').value.trim();
-    var rate = document.querySelector('.popupContent .rateInput').value.trim();
-    var remarks = document.querySelector('.popupContent .remarkInput').value.trim();
+    
+    var rows = document.querySelectorAll('#popupContent tr');
+    
+    // Loop through rows to get updated values for rate and remarks
+    rows.forEach(row => {
+        var rateInput = row.querySelector('.rateInput');
+        var remarkInput = row.querySelector('.remarkInput');
+        var taskDescription = row.cells[2].innerText; // Assuming task description is in the third column
 
-    if (!employeeId || !taskDescription || !rate || !remarks) {
-        alert("Please fill in all fields before saving.");
-        return;
-    }
-
-    var data = {
-        employeeId: employeeId,
-        taskDescription: taskDescription,
-        rate: rate,
-        remarks: remarks
-    };
-
-    // Sending the data to Lambda
-    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+        if (!employeeId || !taskDescription || !rateInput || !remarkInput) {
+            alert("Please fill in all fields before saving.");
+            return;
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        alert('Task updated successfully!');
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        alert('Failed to update the task: ' + error.message);
+
+        var rate = rateInput.value.trim();
+        var remarks = remarkInput.value.trim();
+
+        var data = {
+            employeeId: employeeId,
+            taskDescription: taskDescription,
+            rate: rate,
+            remarks: remarks
+        };
+
+        // Send data to Lambda
+        fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            alert('Task updated successfully!');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Failed to update the task: ' + error.message);
+        });
     });
 }
 
-        function closePopup() {
+ function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
