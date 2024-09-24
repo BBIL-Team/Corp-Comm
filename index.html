@@ -200,51 +200,32 @@
 }
 
 
-     function saveChanges() {
-    var rows = document.querySelectorAll('#popupContent table tbody tr');
-    var tasksData = [];
+    function saveChanges() {
+    const employeeID = document.getElementById('employeeID').value;
+    const taskDescription = document.getElementById('taskDescription').value;
+    const newRate = document.getElementById('newRate').value;
+    const newRemarks = document.getElementById('newRemarks').value;
 
-    rows.forEach(row => {
-        var employeeId = row.cells[0].innerText; // Assuming employee ID is in the first column
-        var taskDescription = row.cells[2].innerText; // Task description in the third column
-        var rate = row.querySelector('.rateInput').value.trim();
-        var remarks = row.querySelector('.remarkInput').value.trim();
+    const body = `${employeeID},${taskDescription},${newRate},${newRemarks}`;
 
-        // Push to tasksData array if all fields are filled
-        if (employeeId && taskDescription && rate && remarks) {
-            tasksData.push(`${employeeId},${taskDescription},${rate},${remarks}`);
-        }
-    });
-
-    if (tasksData.length === 0) {
-        alert("Please fill in all fields before saving.");
-        return;
-    }
-
-    // Send data to Lambda
     fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
         method: 'POST',
         headers: {
-            'Content-Type': 'text/plain'
+            'Content-Type': 'application/json'
         },
-        body: tasksData.join('\n') // Join tasks data with new lines
+        body: JSON.stringify({ body }) // Wrap the body in a JSON object
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
-        alert('Tasks updated successfully!');
-        closePopup(); // Close the popup on success
+        console.log(data);
+        // Handle success
     })
-    .catch((error) => {
+    .catch(error => {
         console.error('Error:', error);
-        alert('Failed to update tasks: ' + error.message);
+        // Handle error
     });
 }
+
 
 function closePopup() {
             document.getElementById('editPopup').style.display = 'none';
