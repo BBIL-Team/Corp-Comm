@@ -248,9 +248,40 @@
 
 
 function closePopup() {
-            document.getElementById('editPopup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-        }
+    // Close your popup logic here
+
+    // Call the function to load and display tasks
+    loadTasks();
+}
+
+function loadTasks() {
+    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayTasks(data); // Assuming data is in the right format
+        })
+        .catch(error => {
+            console.error('Error loading tasks:', error);
+            alert('Failed to load tasks: ' + error.message);
+        });
+}
+
+function displayTasks(tasks) {
+    const tasksContainer = document.getElementById('tasksContainer'); // Your container for tasks
+    tasksContainer.innerHTML = ''; // Clear existing tasks
+
+    tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.textContent = `Employee ID: ${task.EmployeeID}, Task: ${task.TaskDescription}, Rate: ${task.Rate}, Remarks: ${task.Remarks}`;
+        tasksContainer.appendChild(taskElement);
+    });
+}
+
     </script>
 </body>
 </html>
