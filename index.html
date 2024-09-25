@@ -255,15 +255,24 @@ function closePopup() {
 }
 
 function loadTasks() {
-    fetch('https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}')
+    const employeeID = document.getElementById('employeeID').value.trim(); // Get the current employee ID
+    fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
+            return response.text(); // Use text instead of json
         })
         .then(data => {
-            displayTasks(data); // Assuming data is in the right format
+            // Instead of parsing JSON, directly set the inner HTML
+            document.getElementById('cardContainer').innerHTML = data;
+
+            // Show the "Edit" button if there are tasks
+            if (data.trim() !== '') {
+                document.getElementById('editButton').style.display = 'block';
+            } else {
+                document.getElementById('editButton').style.display = 'none';
+            }
         })
         .catch(error => {
             console.error('Error loading tasks:', error);
