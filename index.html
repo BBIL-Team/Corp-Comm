@@ -119,178 +119,109 @@
     
     <!-- Overlay for popup -->
     <div id="overlay" class="overlay" onclick="closePopup()"></div>
+<script>
+    document.getElementById('employeeForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-    <script>
-        document.getElementById('employeeForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        var employeeID = document.getElementById('employeeID').value.trim();
 
-            var employeeID = document.getElementById('employeeID').value.trim();
+        if (!employeeID) {
+            alert('Please enter an Employee ID.');
+            return;
+        }
 
-            if (!employeeID) {
-                alert('Please enter an Employee ID.');
-                return;
+        fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('cardContainer').innerHTML = data;
+
+                // Show the "Edit" button if there are tasks
+                document.getElementById('editButton').style.display = data.trim() ? 'block' : 'none';
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('cardContainer').innerHTML = '<p>Error fetching data. Please try again later.</p>';
+                document.getElementById('editButton').style.display = 'none';
+            });
+    });
+
+    function showEditPopup() {
+        var cardContainer = document.getElementById('cardContainer');
+        var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
+
+        var popupContent = `<table border="1" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Employee Name</th>
+                                        <th>Task Description</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Rate</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+        rows.forEach(row => {
+            var cells = row.querySelectorAll('td');
+            if (cells.length >= 6) {
+                var employeeID = cells[0].innerText;
+                var employeeName = cells[1].innerText;
+                var taskDescription = cells[2].innerText;
+                var startDate = cells[3].innerText;
+                var endDate = cells[4].innerText;
+                var rate = cells[5] ? cells[5].innerText : '';
+                var remarks = cells[6] ? cells[6].innerText : '';
+
+                popupContent += `<tr>
+                                    <td>${employeeID}</td>
+                                    <td>${employeeName}</td>
+                                    <td>${taskDescription}</td>
+                                    <td>${startDate}</td>
+                                    <td>${endDate}</td>
+                                    <td><input type="number" class="rateInput" value="${rate}" min="1" max="5" /></td>
+                                    <td><input type="text" class="remarkInput" value="${remarks}" /></td>
+                                 </tr>`;
             }
-
-            fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('cardContainer').innerHTML = data;
-                    
-                    // Show the "Edit" button if there are tasks
-                    if (data.trim() !== '') {
-                        document.getElementById('editButton').style.display = 'block';
-                    } else {
-                        document.getElementById('editButton').style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById('cardContainer').innerHTML = '<p>Error fetching data. Please try again later.</p>';
-                    document.getElementById('editButton').style.display = 'none';
-                });
         });
 
-      function showEditPopup() {
-    var cardContainer = document.getElementById('cardContainer');
-    var rows = cardContainer.querySelectorAll('tr'); // Assuming tasks are in table rows
+        popupContent += `</tbody></table>`;
 
-    var popupContent = `<table border="1" style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>Employee ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Task Description</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Rate</th>
-                                    <th>Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+        document.getElementById('popupContent').innerHTML = popupContent;
 
-    rows.forEach(row => {
-        var cells = row.querySelectorAll('td');
-        if (cells.length >= 6) { // Make sure there are enough columns
-            var employeeID = cells[0].innerText; // Assuming employee ID is in first column
-            var employeeName = cells[1].innerText; // Assuming employee name is in second column
-            var taskDescription = cells[2].innerText; // Task description is in the third column
-            var startDate = cells[3].innerText; // Start date in the fourth column
-            var endDate = cells[4].innerText; // End date in the fifth column
-            var rate = cells[5] ? cells[5].innerText : ''; // Rate in the sixth column (input field here)
-            var remarks = cells[6] ? cells[6].innerText : ''; // Remarks in the seventh column (input field here)
-
-            popupContent += `<tr>
-                                <td>${employeeID}</td>
-                                <td>${employeeName}</td>
-                                <td>${taskDescription}</td>
-                                <td>${startDate}</td>
-                                <td>${endDate}</td>
-                                <td><input type="number" class="rateInput" value="${rate}" min="1" max="5" /></td>
-                                <td><input type="text" class="remarkInput" value="${remarks}" /></td>
-                             </tr>`;
-        }
-    });
-
-    popupContent += `</tbody></table>`;
-
-    document.getElementById('popupContent').innerHTML = popupContent;
-
-    document.getElementById('editPopup').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
-
-
-   function saveChanges() {
-    var rows = document.querySelectorAll('#popupContent table tbody tr');
-    var tasksData = [];
-
-    rows.forEach(row => {
-        var employeeId = row.cells[0].innerText; // Assuming employee ID is in the first column
-        var taskDescription = row.cells[2].innerText; // Task description in the third column
-        var rate = row.querySelector('.rateInput').value.trim();
-        var remarks = row.querySelector('.remarkInput').value.trim();
-
-        // Push to tasksData array if all fields are filled
-        if (employeeId && taskDescription && rate && remarks) {
-            tasksData.push(`${employeeId},${taskDescription},${rate},${remarks}`);
-        }
-    });
-
-    if (tasksData.length === 0) {
-        alert("Please fill in all fields before saving.");
-        return;
+        document.getElementById('editPopup').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
     }
 
-    // Send data to Lambda
-    fetch('https://tfyct2zj8k.execute-api.ap-south-1.amazonaws.com/A1/test3', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        body: tasksData.join('\n') // Join tasks data with new lines
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        alert('Tasks updated successfully!');
-        closePopup(); // Close the popup on success
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        alert('Failed to update tasks: ' + error.message);
-    });
-}
+    function closePopup() {
+        document.getElementById('editPopup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        
+        // Call the function to load and display tasks
+        loadTasks();
+    }
 
+    function loadTasks() {
+        const employeeID = document.getElementById('employeeID').value.trim(); // Get the current employee ID
+        fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text(); // Use text instead of json
+            })
+            .then(data => {
+                document.getElementById('cardContainer').innerHTML = data;
 
-function closePopup() {
-    // Close your popup logic here
-
-    // Call the function to load and display tasks
-    loadTasks();
-}
-
-function loadTasks() {
-    const employeeID = document.getElementById('employeeID').value.trim(); // Get the current employee ID
-    fetch(`https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeID)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); // Use text instead of json
-        })
-        .then(data => {
-            // Instead of parsing JSON, directly set the inner HTML
-            document.getElementById('cardContainer').innerHTML = data;
-
-            // Show the "Edit" button if there are tasks
-            if (data.trim() !== '') {
-                document.getElementById('editButton').style.display = 'block';
-            } else {
-                document.getElementById('editButton').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading tasks:', error);
-            alert('Failed to load tasks: ' + error.message);
-        });
-}
-
-function displayTasks(tasks) {
-    const tasksContainer = document.getElementById('tasksContainer'); // Your container for tasks
-    tasksContainer.innerHTML = ''; // Clear existing tasks
-
-    tasks.forEach(task => {
-        const taskElement = document.createElement('div');
-        taskElement.textContent = `Employee ID: ${task.EmployeeID}, Task: ${task.TaskDescription}, Rate: ${task.Rate}, Remarks: ${task.Remarks}`;
-        tasksContainer.appendChild(taskElement);
-    });
-}
-
-    </script>
+                // Show the "Edit" button if there are tasks
+                document.getElementById('editButton').style.display = data.trim() ? 'block' : 'none';
+            })
+            .catch(error => {
+                console.error('Error loading tasks:', error);
+                alert('Failed to load tasks: ' + error.message);
+            });
+    }
+</script>
 </body>
 </html>
