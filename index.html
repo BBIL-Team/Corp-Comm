@@ -14,7 +14,7 @@
         }
 
         .logo {
-            height: 120px; /* Adjust the height as needed */
+            height: 120px;
             margin-right: 20px;
         }
         body {
@@ -70,7 +70,6 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        /* Popup styles */
         .popup {
             display: none;
             position: fixed;
@@ -96,7 +95,6 @@
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
-
     </style>
 </head>
 <body>
@@ -109,7 +107,6 @@
 
         <div id="loading">Loading tasks...</div>
 
-        <!-- Month Selector -->
         <div style="text-align: center; margin-bottom: 20px;">
             <label for="monthSelect">Select Month:</label>
             <select id="monthSelect" onchange="fetchTasksForEmployee(employeeId)">
@@ -129,42 +126,32 @@
             </select>
         </div>
 
-        <div id="cardContainer"></div> <!-- This will display the HTML table returned from API -->
-
-        <div id="noTasksMessage">
-            No tasks found for the Employee ID.
-        </div>
+        <div id="cardContainer"></div>
+        <div id="noTasksMessage">No tasks found for the Employee ID.</div>
 
         <div id="buttonContainer" style="display: flex; margin-top: 20px;">
-            <button id="editButton" class="button" style="margin-right: 10px;" onclick="showAddPopup()">Add Task</button>
-            <button id="editButton1" class="button" onclick="showRemovePopup()">Remove Task</button>
+            <button id="editButton" style="margin-right: 10px;" onclick="showAddPopup()">Add Task</button>
+            <button id="editButton1" onclick="showRemovePopup()">Remove Task</button>
         </div>
-    
-               <!-- Popup for adding tasks -->
+
         <div id="addPopup" class="popup">
             <h3>Add New Task</h3>
             <form id="taskForm" action="https://bi3hh9apo0.execute-api.ap-south-1.amazonaws.com/S1/Addtask" method="POST" enctype="application/x-www-form-urlencoded">
                 <label for="employeeid">Employee ID:</label>
                 <input type="text" id="employeeID" name="eID" required><br><br>
-
                 <label for="employeeName">Employee Name:</label>
                 <input type="text" id="employeeName" name="eName" required><br><br>
-
                 <label for="taskDescription">Task:</label>
                 <input type="text" id="taskDescription" name="TaskDescription" required><br><br>
-
                 <label for="StartDate">Start Date:</label>
                 <input type="date" id="StartDate" name="StartDate"><br><br>
-
                 <label for="EndDate">End Date:</label>
                 <input type="date" id="EndDate" name="EndDate"><br><br>
-
-                <button class="button" type="submit">Add</button>
-                <button class="button" type="button" onclick="closePopup('addPopup')">Cancel</button>
+                <button type="submit">Add</button>
+                <button type="button" onclick="closePopup('addPopup')">Cancel</button>
             </form>
         </div>
-        
-        <!-- Popup for removing tasks -->
+
         <div id="removePopup" class="popup">
             <h3>Remove Task</h3>
             <table id="popupTable">
@@ -177,70 +164,65 @@
                     <th>Rating</th>
                     <th>Remarks</th>
                 </thead>
-                <tbody id="popupTaskList">
-                    <!-- Tasks will be populated here -->
-                </tbody>
+                <tbody id="popupTaskList"></tbody>
             </table>
-            <button class="button" onclick="closePopup('removePopup')">Close</button>
+            <button onclick="closePopup('removePopup')">Close</button>
         </div>
 
-        <!-- Overlay for popup -->
         <div id="overlay" class="overlay" onclick="closeOverlay()"></div>
-
-        <!-- Success message popup -->
         <div id="messagePopup" class="popup">
             <p id="messageContent"></p>
-            <button class="button" onclick="closePopup('messagePopup')">Close</button>
+            <button onclick="closePopup('messagePopup')">Close</button>
         </div>
     </div>
 
     <script>
-        const employeeId = '10005315'; // Replace with the employee ID you want to load by default
+        const employeeId = '10005315';
 
         window.onload = function() {
             fetchTasksForEmployee(employeeId);
         };
 
         function fetchTasksForEmployee(employeeId) {
-    const selectedMonth = document.getElementById('monthSelect').value;
-    const apiUrl = `https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeId)}${selectedMonth ? `&Month=${selectedMonth}` : ''}`;
-    document.getElementById('loading').style.display = 'block'; // Show loading message
+            const selectedMonth = document.getElementById('monthSelect').value;
+            const apiUrl = `https://imf44ag3d4.execute-api.ap-south-1.amazonaws.com/S1/Test5?EmployeeID=${encodeURIComponent(employeeId)}${selectedMonth ? `&Month=${selectedMonth}` : ''}`;
+            document.getElementById('loading').style.display = 'block';
 
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById('loading').style.display = 'none';
-            const cardContainer = document.getElementById('cardContainer');
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    const cardContainer = document.getElementById('cardContainer');
 
-            if (data.trim() !== '') {
-                cardContainer.innerHTML = data; // Insert the HTML response directly
-                document.getElementById('editButton').style.display = 'block';
-                document.getElementById('editButton1').style.display = 'block';
-            } else {
-                cardContainer.innerHTML = '';
-                document.getElementById('noTasksMessage').style.display = 'block';
-                document.getElementById('editButton').style.display = 'none';
-                document.getElementById('editButton1').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching tasks:', error);
-            document.getElementById('loading').innerHTML = 'Error loading tasks. Please try again later.';
-        });
-}
+                    if (data.trim() !== '') {
+                        cardContainer.innerHTML = data;
+                        document.getElementById('editButton').style.display = 'block';
+                        document.getElementById('editButton1').style.display = 'block';
+                    } else {
+                        cardContainer.innerHTML = '';
+                        document.getElementById('noTasksMessage').style.display = 'block';
+                        document.getElementById('editButton').style.display = 'none';
+                        document.getElementById('editButton1').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching tasks:', error);
+                    document.getElementById('loading').innerHTML = 'Error loading tasks. Please try again later.';
+                });
+        }
 
-               function showAddPopup() {
+        function showAddPopup() {
             document.getElementById('addPopup').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
         function showRemovePopup() {
-            populatePopupTable(); // Ensure the popup is populated before displaying
+            populatePopupTable();
             document.getElementById('removePopup').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -254,8 +236,30 @@
             document.getElementById('overlay').style.display = 'none';
         }
 
+        async function triggerQuickSightRefresh() {
+            const apiUrl = 'https://bu2skwmyel.execute-api.ap-south-1.amazonaws.com/Q1/refresh'; // Replace with your actual endpoint
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+
+                const data = await response.json();
+                console.log('QuickSight refresh initiated:', data);
+            } catch (error) {
+                console.error('Error triggering QuickSight refresh:', error);
+            }
+        }
+
         document.getElementById('taskForm').onsubmit = async function(event) {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault();
 
             const form = event.target;
             const formData = new FormData(form);
@@ -276,6 +280,9 @@
                 document.getElementById('addPopup').style.display = 'none';
                 closeOverlay();
 
+                // Trigger QuickSight refresh after adding a task
+                await triggerQuickSightRefresh();
+
                 // Re-fetch tasks after adding
                 fetchTasksForEmployee(employeeId);
             } catch (error) {
@@ -284,32 +291,8 @@
                 document.getElementById('messagePopup').style.display = 'block';
             }
         };
-function populatePopupTable() {
-    const tableBody = document.querySelector('#cardContainer table tbody');
-    const popupTaskList = document.getElementById('popupTaskList');
 
-    if (!tableBody) {
-        console.error('Table body not found.');
-        return;
-    }
-
-    popupTaskList.innerHTML = '';
-
-    const rows = tableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-        const clonedRow = row.cloneNode(true);
-        const removeButtonCell = document.createElement('td');
-
-        const employeeName = clonedRow.children[1].innerText; // Assuming employee name is in the second column
-        const taskDescription = clonedRow.children[2].innerText; // Assuming task description is in the third column
-
-        removeButtonCell.innerHTML = `<button class="button" onclick="removeTask('${employeeName}', '${taskDescription}')">X</button>`;
-        
-        clonedRow.appendChild(removeButtonCell);
-        popupTaskList.appendChild(clonedRow);
-    });
-}
-  const removeTask = async (employeeName, taskDescription) => {
+        const removeTask = async (employeeName, taskDescription) => {
             const apiUrl = 'https://oje3cr7sy2.execute-api.ap-south-1.amazonaws.com/V1/RemoveTask';
             const plainText = `${employeeName},${taskDescription}`;
 
@@ -329,8 +312,12 @@ function populatePopupTable() {
                 const data = await response.json();
                 document.getElementById('messageContent').innerText = data.message || 'Task removed successfully.';
                 document.getElementById('messagePopup').style.display = 'block';
-                closePopup('removePopup'); // Close the remove task popup
-                fetchTasksForEmployee(employeeId); // Refresh task list
+                closePopup('removePopup');
+
+                // Trigger QuickSight refresh after removing a task
+                await triggerQuickSightRefresh();
+
+                fetchTasksForEmployee(employeeId);
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('messageContent').innerText = 'Request failed: ' + error.message;
@@ -338,14 +325,31 @@ function populatePopupTable() {
             }
         };
 
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-            closeOverlay();
-        }
+        function populatePopupTable() {
+            const tableBody = document.querySelector('#cardContainer table tbody');
+            const popupTaskList = document.getElementById('popupTaskList');
 
-        function closeOverlay() {
-            document.getElementById('overlay').style.display = 'none';
+            if (!tableBody) {
+                console.error('Table body not found.');
+                return;
+            }
+
+            popupTaskList.innerHTML = '';
+
+            const rows = tableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const clonedRow = row.cloneNode(true);
+                const removeButtonCell = document.createElement('td');
+
+                const employeeName = clonedRow.children[1].innerText;
+                const taskDescription = clonedRow.children[2].innerText;
+
+                removeButtonCell.innerHTML = `<button onclick="removeTask('${employeeName}', '${taskDescription}')">X</button>`;
+                
+                clonedRow.appendChild(removeButtonCell);
+                popupTaskList.appendChild(clonedRow);
+            });
         }
-</script>
+    </script>
 </body>
 </html>
